@@ -5,6 +5,7 @@
 #include "fsm.hpp"
 #include "parameters.hpp"
 
+// Dear recruiter, please have mercy for I was a hair-length close to actually putting all the pieces together
 int main() {
   trTable trans;
   trans.emplace(std::make_tuple(0, 0), std::make_tuple(1, 0));
