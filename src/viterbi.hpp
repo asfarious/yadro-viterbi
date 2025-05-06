@@ -24,7 +24,8 @@ private:
 public:
   ViterbiDecoder(int constraintLength, trTable transitionMatrix);
   bool step(codeOutput input);
-  bool decode(codeOutput input);
+  bool decode(codeOutput* input, int inputlen);
+  std::vector<codeInput> getOutput();
   ~ViterbiDecoder();
 };
 

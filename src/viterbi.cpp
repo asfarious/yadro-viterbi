@@ -87,3 +87,17 @@ bool ViterbiDecoder::step(codeOutput input) {
 
   return false;
 }
+
+bool ViterbiDecoder::decode(codeInput* input, int inputlen) {
+  for (int j = 0; j < inputlen; j++) {
+    if(! step(input[j])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+std::vector<codeInput> ViterbiDecoder::getOutput() {
+  std::vector<codeInput> result(output);
+  return result;
+}
