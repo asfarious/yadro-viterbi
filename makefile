@@ -8,7 +8,7 @@ BUILD_PATH = bin
 TARGET = viterbi
 VPATH = src
 
-OBJ = main.o fsm.o
+OBJ = main.o fsm.o convcode.o viterbi.o
 FILE_OBJ = $(addprefix ${BUILD_PATH}/, ${OBJ})
 
 ${TARGET}: ${FILE_OBJ}

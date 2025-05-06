@@ -12,7 +12,7 @@ int main() {
   trans.emplace(std::make_tuple(1, 0), std::make_tuple(0, 0));
   trans.emplace(std::make_tuple(1, 1), std::make_tuple(1, 1));
 
-  FiniteStateMachine fsm(trans, 0);
+  FiniteStateMachine fsm(&trans, 0);
 
   codeOutput result;
     
