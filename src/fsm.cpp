@@ -2,13 +2,14 @@
 #include <tuple>
 
 #include "fsm.hpp"
+#include "parameters.hpp"
 
-IntStateMachine::IntStateMachine(trTable transitionTable, fsmState initialState) {
+FiniteStateMachine::FiniteStateMachine(trTable transitionTable, fsmState initialState) {
   this->curState = initialState;
   this->transitionTable = transitionTable;
 }
 
-bool IntStateMachine::tryUpdate(fsmInput input, fsmOutput *output) {
+bool FiniteStateMachine::tryUpdate(codeInput input, codeOutput *output) {
   auto maybeResult = this->transitionTable.find(std::make_tuple(this->curState, input));
   if (maybeResult != this->transitionTable.end()) {
     fsmState newState;
@@ -18,4 +19,12 @@ bool IntStateMachine::tryUpdate(fsmInput input, fsmOutput *output) {
   } else {
     return false;
   }
+}
+
+fsmState FiniteStateMachine::getState() {
+  return this->curState;
+}
+
+trTable FiniteStateMachine::getTransitionMatrix() {
+  return this->transitionTable;
 }

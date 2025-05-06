@@ -2,24 +2,23 @@
 #define FSM
 
 /*
-  A simple templateless finite state machine using integers for both states and input/output
+  A simple templateless finite state machine using integers for states and bytes for input/output
  */
 
 #include <map>
 #include <tuple>
 
-typedef unsigned int fsmState;
-typedef unsigned int fsmInput;
-typedef unsigned int fsmOutput;
-typedef std::map<std::tuple<fsmState, fsmInput>, std::tuple<fsmState, fsmOutput>> trTable;
+#include "parameters.hpp"
 
-class IntStateMachine {
+class FiniteStateMachine {
 private:
   fsmState curState;
   trTable transitionTable;
 public:
-  IntStateMachine(trTable transitionTalbe, fsmState initialState);
-  bool tryUpdate(fsmInput input, fsmOutput *output);
+  FiniteStateMachine(trTable transitionTalbe, fsmState initialState);
+  bool tryUpdate(codeInput input, codeOutput *output);
+  fsmState getState();
+  trTable getTransitionMatrix();
 };
 
 #endif

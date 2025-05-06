@@ -1,0 +1,24 @@
+#ifndef PARAMETERS
+#define PARAMETERS
+/*
+  this header contains parameters that may be decoupled from the rest of the code
+  if templates are to be used
+ */
+
+#include <map>
+#include <tuple>
+
+/*
+  default code input and output type is char;
+  it is parametrized here to be easily replaced by templates if needed
+ */
+typedef unsigned char codeInput;
+typedef unsigned char codeOutput;
+
+/*
+  details of internal specification of the finite state machine implementing the convolution code
+ */
+typedef unsigned int fsmState;
+typedef std::map<std::tuple<fsmState, codeInput>, std::tuple<fsmState, codeOutput>> trTable;
+
+#endif
