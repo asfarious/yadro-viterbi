@@ -81,7 +81,7 @@ bool ViterbiDecoder::step(codeOutput input) {
   delete[] new_distances;
   
   if(curStep >= truncationLength) {
-    this->output.emplace_back((curStep + 1) % (truncationLength + 1));
+    this->output.emplace_back(sequences[0][(curStep + 1) % (truncationLength + 1)]);
     return true;
   }
 
