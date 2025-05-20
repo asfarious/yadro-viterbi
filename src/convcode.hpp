@@ -17,4 +17,6 @@ public:
   std::vector<codeOutput> getOutput();
 };
 
+void impulse2transitionTable(codeInput *impulseResponse, int constraintLength, trTable *result);
+
 #endif
