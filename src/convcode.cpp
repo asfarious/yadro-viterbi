@@ -1,6 +1,8 @@
 #include <vector>
 #include <tuple>
 
+#include <iostream>
+
 #include "fsm.hpp"
 #include "parameters.hpp"
 #include "convcode.hpp"
@@ -17,6 +19,7 @@ std::vector<codeOutput> ConvCoder::getOutput() {
 bool ConvCoder::step(codeInput input) {
   codeOutput nextSymbol;
   if(this->fsm.tryUpdate(input, &nextSymbol)) {
+    std::cout << (int) input << " : " << (int) nextSymbol << std::endl;
     output.emplace_back(nextSymbol);
     return true;
   } else {
@@ -39,14 +42,10 @@ void impulse2transitionTable(codeInput *impulseResponse, int constraintLength, t
   int outputSize = __builtin_popcount(max_output);
   // This assumes max_input and max_output to be of form 2^n-1 !!!
   
-  fsmState maxState = 0;
-  for(int j = 0; j < constraintLength - 1; j++) {
-    maxState = (maxState << inputSize) + max_input;
-  }
+  fsmState maxState = (1  << (inputSize * (constraintLength - 1))) - 1;
   /*
-    i.e. for max_input = 11, K = 3
-    maxState is 0 -> 11 -> 1111
-  */
+    2^{n(K-1)} - 1 is a sequence of n(K-1) ones, which is the maximum state attainable.
+   */
   
   for(fsmState state = 0; state < maxState+1; state++) {
     for(codeInput input = 0; input < max_input + 1; input++) {
