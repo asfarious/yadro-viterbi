@@ -11,20 +11,27 @@ private:
   std::vector<codeInput> output;
   
   int truncationLength;
-  bool isMature;
   int curStep;
+  int flushedSteps;
   
-  // calculated distances for different paths and corresponding sequences
   codeInput **sequences;
-  codeInput **next_sequences;
+  // sequence[j] is the most probable sequence to currently be in state j
+
+  codeInput **next_sequences; // the second buffer to swap with sequences
+
   int *distances;
+  // distances[j] is the distance of the most probable sequence to currently be in state j
+
+  bool *wasReached;
+  // wasReached[j] is whether state j was reached by any sequence yet
   
   fsmState states;
-  trTable *transitionTable;
+  trTable transitionTable;
 public:
   ViterbiDecoder(int constraintLength, trTable transitionMatrix);
   bool step(codeOutput input);
   bool decode(codeOutput* input, int inputlen);
+  void flushOutput();
   std::vector<codeInput> getOutput();
   ~ViterbiDecoder();
 };
