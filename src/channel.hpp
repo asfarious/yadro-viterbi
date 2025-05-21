@@ -6,7 +6,7 @@
 #include "parameters.hpp"
 
 typedef std::minstd_rand Generator;
-typedef std::uniform_int_distribution<> Distribution;
+typedef std::uniform_int_distribution<int> Distribution;
 
 class Channel {
 private:
@@ -16,6 +16,7 @@ private:
   void generateMask(codeOutput* mask, int len);
 public:
   Channel(double probability);
+  void setProbability(double probability);
   codeOutput* applyNoise(codeOutput* signal, int len);
 };
 

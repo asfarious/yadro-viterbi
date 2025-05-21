@@ -7,8 +7,12 @@ Channel::Channel(double probability): distribution(0, 100), generator() {
   this->probability = probability;
 }
 
+void Channel::setProbability(double probability) {
+  this->probability = probability;
+}
+
 void Channel::generateMask(codeOutput* mask, int len) {
-  int size = __builtin_popcount(max_output); // works if max_output is of form 2^n - 1
+  int size = output_size;
   for (int j = 0; j < len; j++) {
     mask[j] = 0;
     for(int k = 0; k < size; k++) {
