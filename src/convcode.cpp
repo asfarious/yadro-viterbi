@@ -1,13 +1,11 @@
 #include <vector>
 #include <tuple>
 
-#include <iostream>
-
 #include "fsm.hpp"
 #include "parameters.hpp"
 #include "convcode.hpp"
 
-ConvCoder::ConvCoder(trTable transitionTable): fsm(&transitionTable, 0) {
+ConvCoder::ConvCoder(trTable transitionTable): fsm(transitionTable, 0) {
   this->output = {};
 }
 
@@ -19,7 +17,6 @@ std::vector<codeOutput> ConvCoder::getOutput() {
 bool ConvCoder::step(codeInput input) {
   codeOutput nextSymbol;
   if(this->fsm.tryUpdate(input, &nextSymbol)) {
-    std::cout << (int) input << " : " << (int) nextSymbol << std::endl;
     output.emplace_back(nextSymbol);
     return true;
   } else {
@@ -36,8 +33,7 @@ bool ConvCoder::encode(codeInput* input, int inputlen) {
   return true;
 }
 
-void impulse2transitionTable(const codeInput *impulseResponse, const int constraintLength,
-			     trTable *result) {
+trTable impulse2transitionTable(const codeInput *impulseResponse, const int constraintLength) {
   trTable transitionMatrix = {};
   
   fsmState maxState = (1  << (input_size * (constraintLength - 1))) - 1;
@@ -63,9 +59,9 @@ void impulse2transitionTable(const codeInput *impulseResponse, const int constra
 	// popcount(x) % 2 xors all the bits of x (adds them modulo 2) 
 	output = (output << 1) + nextBit;
       }
-      transitionMatrix.emplace(std::make_tuple(state, input), std::make_tuple(nextState, output));
+      transitionMatrix.emplace(std::make_tuple(state, input),
+					     std::make_tuple(nextState, output));
     }
   }
-  *result = transitionMatrix;
-  return;
+  return transitionMatrix;
 }
