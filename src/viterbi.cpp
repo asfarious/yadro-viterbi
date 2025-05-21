@@ -1,4 +1,5 @@
 #include <climits>
+#include <algorithm>
 #include <vector>
 #include <tuple>
 #include <map>
@@ -22,6 +23,8 @@ ViterbiDecoder::ViterbiDecoder(int constraintLength, trTable transitionMatrix) {
   
   this->sequences = new codeInput*[states];
   this->next_sequences = new codeInput*[states];
+  this->distances = new int[states];
+  
   for(fsmState j = 0; j < states; j++) {
     this->distances[j] = 0;
     (this->sequences)[j] = new codeInput[truncationLength+1];
@@ -29,7 +32,9 @@ ViterbiDecoder::ViterbiDecoder(int constraintLength, trTable transitionMatrix) {
   }
   
   this->wasReached = new bool[states] {};
+  this->isReached = new bool[states] {};
   wasReached[0] = true;
+  isReached[0] = true;
   
   this->transitionTable = transitionMatrix;
 }
@@ -41,16 +46,14 @@ ViterbiDecoder::~ViterbiDecoder() {
   }
   delete[] this->sequences;
   delete[] this->next_sequences;
+  delete[] this->distances;
 }
 
-/*
-  we keep track of up to "states" sequences, each 
- */
 bool ViterbiDecoder::step(codeOutput input) {
   fsmState *candidates = new fsmState[this->states];
   codeInput *newSymbol = new codeInput[this->states];
   int *new_distances = new int[this->states];
-
+  
   for(fsmState j = 0; j < this->states; j++) { //sensible initial values to mitigate errors
     candidates[j] = j;
     new_distances[j] = INT_MAX;
@@ -67,11 +70,12 @@ bool ViterbiDecoder::step(codeOutput input) {
 	codeOutput symbol;
 	std::tie(destination, symbol) = maybeResult->second;
 	int new_distance = hammingDistance(symbol, input) + this->distances[j];
-	if(!wasReached[destination] ||  new_distance < new_distances[destination]) {
-	  wasReached[destination] = true;
+	
+	if(new_distance < new_distances[destination]) {
+	  isReached[destination] = true;
 	  candidates[destination] = j;
 	  new_distances[destination] = new_distance;
-	  newSymbol[j] = k;
+	  newSymbol[destination] = k;
 	}
       } else {
 	delete[] candidates;
@@ -89,35 +93,51 @@ bool ViterbiDecoder::step(codeOutput input) {
     this->next_sequences[j][curStep % (truncationLength + 1)] = newSymbol[j];
     this->distances[j] = new_distances[j];
   }
-  codeInput **temp = this->sequences;
+  codeInput **tempSeq = this->sequences;
   this->sequences = this->next_sequences;
-  this->next_sequences = temp;
+  this->next_sequences = tempSeq;
+
+  bool *tempReached = this->wasReached;
+  this->wasReached = this->isReached;
+  this->isReached = tempReached;
+  
   delete[] candidates;
   delete[] newSymbol;
   delete[] new_distances;
+  
+  bool hasProducedOutput = false;
   
   if(curStep >= truncationLength) {
     if(flushedSteps > 0) {
       --flushedSteps;
     } else {
       this->output.emplace_back(sequences[0][(curStep + 1) % (truncationLength + 1)]);
+      hasProducedOutput = true;
     }
-    return true;
   }
 
-  return false;
+  curStep++;
+  return hasProducedOutput;
 }
 
 bool ViterbiDecoder::decode(codeInput* input, int inputlen) {
+  bool hasProducedOutput = false;
   for(int j = 0; j < inputlen; j++) {
-    if(! step(input[j])) {
-      return false;
+    if(step(input[j])) {
+      hasProducedOutput = true;
     }
   }
-  return true;
+  return hasProducedOutput;
 }
 
 void ViterbiDecoder::flushOutput() {
+
+  int stepsToFlush = std::max(truncationLength, curStep);
+
+  if(stepsToFlush < 1) {
+    return;
+  }
+  
   int candidate = 0;
   int distance = distances[candidate];
   for(fsmState j = 0; j < this->states; j++) {
@@ -126,10 +146,10 @@ void ViterbiDecoder::flushOutput() {
       distance = distances[candidate];
     }
   }
-  for(int k = 1; k < truncationLength + 1; k++) { // SIC! INITAL K IS 1!
-    this->output.emplace_back(sequences[candidate][(curStep + 1 + k) % (truncationLength + 1)]);
+  for(int k = 1; k < stepsToFlush + 1; k++) { // SIC! INITAL K IS 1!
+    this->output.emplace_back(sequences[candidate][(curStep + k) % (truncationLength + 1)]);
   }
-  flushedSteps = truncationLength;
+  flushedSteps = stepsToFlush;
 }
 
 std::vector<codeInput> ViterbiDecoder::getOutput() {

@@ -23,6 +23,7 @@ private:
   // distances[j] is the distance of the most probable sequence to currently be in state j
 
   bool *wasReached;
+  bool *isReached;
   // wasReached[j] is whether state j was reached by any sequence yet
   
   fsmState states;
