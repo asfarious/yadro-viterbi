@@ -36,13 +36,11 @@ bool ConvCoder::encode(codeInput* input, int inputlen) {
   return true;
 }
 
-void impulse2transitionTable(codeInput *impulseResponse, int constraintLength, trTable *result) {
+void impulse2transitionTable(const codeInput *impulseResponse, const int constraintLength,
+			     trTable *result) {
   trTable transitionMatrix = {};
-  int inputSize = __builtin_popcount(max_input);
-  int outputSize = __builtin_popcount(max_output);
-  // This assumes max_input and max_output to be of form 2^n-1 !!!
   
-  fsmState maxState = (1  << (inputSize * (constraintLength - 1))) - 1;
+  fsmState maxState = (1  << (input_size * (constraintLength - 1))) - 1;
   /*
     2^{n(K-1)} - 1 is a sequence of n(K-1) ones, which is the maximum state attainable.
    */
@@ -50,7 +48,7 @@ void impulse2transitionTable(codeInput *impulseResponse, int constraintLength, t
   for(fsmState state = 0; state < maxState+1; state++) {
     for(codeInput input = 0; input < max_input + 1; input++) {
       
-      fsmState nextState = (state >> inputSize) + (input * (maxState + 1) >> inputSize);
+      fsmState nextState = (state >> input_size) + (input * (maxState + 1) >> input_size);
       /*
 	i.e., for constraint_length = 4, state ABC and input I the next state is IAB
        */
@@ -60,7 +58,7 @@ void impulse2transitionTable(codeInput *impulseResponse, int constraintLength, t
       
       codeOutput output = 0;
       codeOutput nextBit = 0;
-      for(int j = 0; j < outputSize; j++) {
+      for(int j = 0; j < output_size; j++) {
 	nextBit = __builtin_popcount(impulseResponse[j] & coderRegister) % 2;
 	// popcount(x) % 2 xors all the bits of x (adds them modulo 2) 
 	output = (output << 1) + nextBit;

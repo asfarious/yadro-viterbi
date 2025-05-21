@@ -15,8 +15,13 @@
 typedef unsigned char codeInput;
 typedef unsigned char codeOutput;
 
-const codeInput max_input = 3; //11
-const codeOutput max_output = 15; //1111
+// code parameters
+const int input_size = 2;
+const int output_size = 4;
+const int constraintLength = 3;
+const codeInput max_input = (1 << input_size) - 1;
+const codeOutput max_output = (1 << output_size) - 1;
+const codeInput impulseResponse[4] = {0b100010, 0b100001, 0b110011, 0b111111};
 
 /*
   details of internal specification of the finite state machine implementing the convolution code
