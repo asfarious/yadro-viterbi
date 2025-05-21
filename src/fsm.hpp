@@ -13,12 +13,12 @@
 class FiniteStateMachine {
 private:
   fsmState curState;
-  trTable *transitionTable;
+  trTable transitionTable;
 public:
-  FiniteStateMachine(trTable *transitionTable, fsmState initialState);
+  FiniteStateMachine(trTable transitionTable, fsmState initialState);
   bool tryUpdate(codeInput input, codeOutput *output);
   fsmState getState();
-  trTable* getTransitionMatrix();
+  trTable getTransitionMatrix();
 };
 
 #endif
